@@ -82,6 +82,15 @@ class UserController(private val userRepository: UserRepository) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
+    @DeleteMapping("clear/key = {key}")
+    fun clearUsers(@PathVariable("key") key: String): ResponseEntity<Unit> {
+        if(key != "2003") {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
+        userRepository.deleteAll()
+        println("DELETE: Deleted all users.")
+        return ResponseEntity(HttpStatus.OK)
+    }
 
 
 }

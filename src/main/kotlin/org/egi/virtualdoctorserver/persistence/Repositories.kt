@@ -3,6 +3,7 @@ package org.egi.virtualdoctorserver.persistence
 import org.egi.virtualdoctorserver.model.Restaurant
 import org.egi.virtualdoctorserver.model.RestaurantOwner
 import org.egi.virtualdoctorserver.model.User
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import java.util.*
@@ -15,6 +16,10 @@ interface UserRepository : CrudRepository<User, Long> {
     //@Query("Select new " + "org.egi.virtualdoctorserver.dto.UserDietaryRequirementsDTO(u.calorieLimit, u.maxSugarContent,u.maxFatContent, u.maxProteinContent, u.isVegetarian, u.isVegan) from User u where username = :username")
     @Query("select calorie_limit, max_sugar_content, max_fat_content, max_protein_content, is_vegetarian, is_vegan from users where username = :username", nativeQuery = true)
     fun findDietaryRequirements(username: String): List<Array<Any>>
+
+    @Modifying
+    @Query("Alter Sequence users RESTART WITH 1 ", nativeQuery = true)
+    fun truncateTable()
 }
 
 interface RestaurantRepository : CrudRepository<Restaurant, Long> {
