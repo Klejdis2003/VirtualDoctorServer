@@ -32,9 +32,9 @@ class UserController(private val userRepository: UserRepository) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
-    @GetMapping("/username/{username}")
-    fun getUserByUsername(@PathVariable("username") username: String): ResponseEntity<User> {
-        val user = userRepository.findByUsername(username)
+    @GetMapping("find")
+    fun getUserByEmail(@RequestParam email: String): ResponseEntity<User> {
+        val user = userRepository.findByEmail(email)
         return if (user.isPresent) {
             ResponseEntity(user.get(), HttpStatus.OK)
         } else {

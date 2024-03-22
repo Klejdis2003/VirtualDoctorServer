@@ -10,10 +10,27 @@ import java.util.*
 
 interface UserRepository : CrudRepository<User, Long> {
 
+    /**
+     * @param email the email of the user
+     * @return the user with the given email if it exists or an empty optional if it does not
+     */
+    fun findByEmail(email: String): Optional<User>
+
+    /**
+     * @param username the username of the user
+     * @return the user with the given username if it exists or an empty optional if it does not
+     */
     fun findByUsername(username: String): Optional<User>
 
+    /**
+     * @param username the username of the user
+     * @return true if a user with the given username exists, false otherwise
+     */
 
-    //@Query("Select new " + "org.egi.virtualdoctorserver.dto.UserDietaryRequirementsDTO(u.calorieLimit, u.maxSugarContent,u.maxFatContent, u.maxProteinContent, u.isVegetarian, u.isVegan) from User u where username = :username")
+    /**
+     * @param username the username of the user
+     * @return the dietary requirements of the user with the given username
+     */
     @Query("select calorie_limit, max_sugar_content, max_fat_content, max_protein_content, is_vegetarian, is_vegan from users where username = :username", nativeQuery = true)
     fun findDietaryRequirements(username: String): List<Array<Any>>
 
