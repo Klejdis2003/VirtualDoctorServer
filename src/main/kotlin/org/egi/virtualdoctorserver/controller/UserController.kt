@@ -32,6 +32,7 @@ class UserController(private val userRepository: UserRepository) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
+
     @GetMapping("find")
     fun getUserByEmail(@RequestParam email: String): ResponseEntity<User> {
         val user = userRepository.findByEmail(email)

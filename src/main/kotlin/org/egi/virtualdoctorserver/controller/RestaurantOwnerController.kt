@@ -24,18 +24,9 @@ class RestaurantOwnerController(private val restaurantOwnerRepository: Restauran
         }
     }
 
-    @GetMapping("/username={username}")
-    fun getRestaurantOwnerByUsername(@PathVariable("username") username: String): ResponseEntity<RestaurantOwner> {
-        val restaurantOwner = restaurantOwnerRepository.findByUsername(username)
-        return if (restaurantOwner.isPresent) {
-            ResponseEntity(restaurantOwner.get(), HttpStatus.OK)
-        } else {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
-    }
 
-    @GetMapping("/email={email}")
-    fun getRestaurantOwnerByEmail(@PathVariable("email") email: String): ResponseEntity<RestaurantOwner> {
+    @GetMapping("find")
+    fun getRestaurantOwnerByEmail(@RequestParam("email") email: String): ResponseEntity<RestaurantOwner> {
         val restaurantOwner = restaurantOwnerRepository.findByEmail(email)
         return if (restaurantOwner.isPresent) {
             ResponseEntity(restaurantOwner.get(), HttpStatus.OK)
@@ -60,6 +51,15 @@ class RestaurantOwnerController(private val restaurantOwnerRepository: Restauran
     fun deleteRestaurantOwner(@PathVariable("id") restaurantOwnerId: Int): ResponseEntity<Unit> {
         restaurantOwnerRepository.deleteById(restaurantOwnerId.toLong())
         return ResponseEntity(HttpStatus.NO_CONTENT)
+    }
+
+    @DeleteMapping("clear/key={key}")
+    fun deleteAllRestaurantOwners(@PathVariable("key") key: String): ResponseEntity<Unit> {
+        println("DELETE ALL RESTAURANT OWNERS, KEY: $key")
+        if(key != "2003")
+            return ResponseEntity.status(403).build()
+        restaurantOwnerRepository.deleteAll()
+        return ResponseEntity.status(200).build()
     }
 
 }
