@@ -1,5 +1,6 @@
 package org.egi.virtualdoctorserver.model
 
+import jakarta.annotation.Nonnull
 import jakarta.persistence.*
 
 @Entity
@@ -8,7 +9,9 @@ data class RestaurantOwner(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
+    @Nonnull
     val username: String,
+    @Nonnull
     val email: String
 )
 

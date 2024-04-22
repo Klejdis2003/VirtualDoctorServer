@@ -18,15 +18,9 @@ data class User(
     val age: Int,
     val height: Float, //height in cm
     val weight: Float, //weight in kg
-    val calorieLimit: Int = NO_LIMIT,
-    val maxSugarContent: Int = NO_LIMIT,
-    val maxFatContent: Int =  NO_LIMIT,
-    val maxProteinContent: Int = NO_LIMIT,
-    val isVegetarian: Boolean = false,
-    val isVegan: Boolean = false,
-//    val glutenFree: Boolean = false,
-//    val nutFree: Boolean = false,
-//    val dairyFree: Boolean = false,
-//    val halal: Boolean = false,
-//    val kosher: Boolean = false,
+
+    @JoinColumn(name = "dietary_requirements_id", nullable = false)
+    @ManyToOne
+    val dietaryRequirements: DietaryRestrictions
     )
+

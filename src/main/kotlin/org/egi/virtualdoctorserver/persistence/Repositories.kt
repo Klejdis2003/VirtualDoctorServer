@@ -1,11 +1,15 @@
 package org.egi.virtualdoctorserver.persistence
 
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import org.egi.virtualdoctorserver.model.Restaurant
 import org.egi.virtualdoctorserver.model.RestaurantOwner
 import org.egi.virtualdoctorserver.model.User
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 import java.util.*
 
 interface UserRepository : CrudRepository<User, Long> {
@@ -39,13 +43,5 @@ interface UserRepository : CrudRepository<User, Long> {
     fun truncateTable()
 }
 
-interface RestaurantRepository : CrudRepository<Restaurant, Long> {
-    fun findByName(name: String): List<Restaurant>
-    fun findByCity(city: String): List<Restaurant>
-    fun findByOwnerId(ownerId: Long): List<Restaurant>
-}
 
-interface RestaurantOwnerRepository : CrudRepository<RestaurantOwner, Long> {
-    fun findByUsername(username: String): Optional<RestaurantOwner>
-    fun findByEmail(email: String): Optional<RestaurantOwner>
-}
+

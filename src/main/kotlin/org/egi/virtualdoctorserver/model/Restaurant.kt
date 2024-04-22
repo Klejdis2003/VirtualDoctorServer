@@ -9,7 +9,7 @@ data class Restaurant(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val name: String,
-    val street_address: String,
+    val streetAddress: String,
     val city: String,
     val postcode: String,
     val country: String,
@@ -17,6 +17,6 @@ data class Restaurant(
     val email: String,
     val website: String,
     @JoinColumn(name = "owner_id", nullable = false)
-    @OneToOne(cascade = [CascadeType.ALL])
+    @ManyToOne
     val owner: RestaurantOwner
 )

@@ -1,8 +1,12 @@
 package org.egi.virtualdoctorserver.controller
 
+import org.egi.virtualdoctorserver.dto.DailyStatsDTO
 import org.egi.virtualdoctorserver.dto.UserDietaryRequirementsDTO
+import org.egi.virtualdoctorserver.model.DailyStats
 import org.egi.virtualdoctorserver.model.User
+import org.egi.virtualdoctorserver.persistence.DailyStatsRepository
 import org.egi.virtualdoctorserver.persistence.UserRepository
+import org.egi.virtualdoctorserver.services.DailyStatsService
 import org.egi.virtualdoctorserver.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -10,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
-class UserController(private val userRepository: UserRepository) {
+class UserController(private val userRepository: UserRepository, private val dailyStatsService: DailyStatsService) {
     @GetMapping
     fun getAllUsers() = userRepository.findAll().toList()
 
@@ -61,6 +65,18 @@ class UserController(private val userRepository: UserRepository) {
                 user[4] as Boolean,
                 user[5] as Boolean)
         return ResponseEntity(userDietaryRequirements, HttpStatus.OK)
+    }
+
+    @GetMapping("/{id}/daily_stats")
+    fun getUserDailyStats(@PathVariable("id") userId: Long): ResponseEntity<DailyStatsDTO> {
+        try{
+            val dailyStats = dailyStatsService.getDailyStatsByUserId(userId)
+            return ResponseEntity(dailyStats, HttpStatus.OK)
+        }
+        catch (e: Exception){
+            e.printStackTrace()
+            return ResponseEntity(HttpStatus.NOT_FOUND)
+        }
     }
 
     @PutMapping("/{id}")
