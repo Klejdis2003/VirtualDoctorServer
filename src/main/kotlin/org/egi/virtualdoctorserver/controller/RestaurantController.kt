@@ -1,11 +1,11 @@
 package org.egi.virtualdoctorserver.controller
 
+import org.egi.virtualdoctorserver.dto.ItemDTO
 import org.egi.virtualdoctorserver.model.DietaryRestrictions
 import org.egi.virtualdoctorserver.model.Item
 import org.egi.virtualdoctorserver.model.Restaurant
-import org.egi.virtualdoctorserver.model.RestaurantItem
-import org.egi.virtualdoctorserver.persistence.RestaurantItemRepository
 import org.egi.virtualdoctorserver.persistence.RestaurantRepository
+import org.egi.virtualdoctorserver.services.RestaurantService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/restaurants")
 class RestaurantController(
     private val restaurantRepository: RestaurantRepository,
-    private val restaurantItemRepository: RestaurantItemRepository
+    private val restaurantService: RestaurantService
     ) {
     @GetMapping
     fun getAllRestaurants() = restaurantRepository.findAll().toList()
@@ -48,15 +48,29 @@ class RestaurantController(
     }
 
     @GetMapping("/{id}/menu")
-    fun getRestaurantMenu(@PathVariable("id") restaurantId: Int): ResponseEntity<List<Item>> {
-        val restaurantItems = restaurantItemRepository.getRestaurantItemsByRestaurantId(restaurantId.toLong())
+    fun getRestaurantMenu(@PathVariable("id") restaurantId: Long): ResponseEntity<List<ItemDTO>> {
+        val restaurantItems = restaurantService.getRestaurantMenu(restaurantId)
         return ResponseEntity(restaurantItems, HttpStatus.OK)
     }
 
+    @PostMapping("/{id}/menu")
+    fun addItemToMenu(@PathVariable("id") restaurantId: Long, @RequestBody itemDTO: ItemDTO): ResponseEntity<List<ItemDTO>> {
+        try {
+            restaurantService.addItemToMenu(restaurantId, itemDTO)
+            return ResponseEntity(restaurantService.getRestaurantMenu(restaurantId), HttpStatus.CREATED)
+        }
+        catch (e: IllegalArgumentException) {
+            return ResponseEntity(HttpStatus.CONFLICT)
+        }
+        catch (e: Exception) {
+            return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
     @GetMapping("/filteredItems")
-    fun filterItemsByDietaryRestrictions(@RequestBody dietaryRestrictions: DietaryRestrictions): ResponseEntity<List<RestaurantItem>> {
+    fun filterItemsByDietaryRestrictions(@RequestBody dietaryRestrictions: DietaryRestrictions): ResponseEntity<List<Item>> {
         try{
-            val restaurantItems = restaurantItemRepository.findAllItemsByDietaryRestrictions(dietaryRestrictions)
+            val restaurantItems = restaurantService.filterItemsByDietaryRestrictions(dietaryRestrictions)
             return ResponseEntity(restaurantItems, HttpStatus.OK)
         }
         catch (e: Exception){
@@ -65,10 +79,9 @@ class RestaurantController(
     }
 
     @GetMapping("/{id}/filteredMenu")
-    fun filterRestaurantMenuByDietaryRestrictions(@PathVariable("id") restaurantId: Int, @RequestBody dietaryRestrictions: DietaryRestrictions): ResponseEntity<List<Item>> {
+    fun filterRestaurantMenuByDietaryRestrictions(@PathVariable("id") restaurantId: Long, @RequestBody dietaryRestrictions: DietaryRestrictions): ResponseEntity<List<Item>> {
         try {
-            val restaurantItems =
-                restaurantItemRepository.filterItemsByDietaryRestrictions(restaurantId.toLong(), dietaryRestrictions)
+            val restaurantItems = restaurantService.filterItemsByDietaryRestrictions(dietaryRestrictions)
             return ResponseEntity(restaurantItems, HttpStatus.OK)
         }
         catch (e: Exception) {

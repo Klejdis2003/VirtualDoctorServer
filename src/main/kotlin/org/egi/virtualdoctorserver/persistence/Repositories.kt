@@ -2,6 +2,7 @@ package org.egi.virtualdoctorserver.persistence
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import org.egi.virtualdoctorserver.model.Item
 import org.egi.virtualdoctorserver.model.Restaurant
 import org.egi.virtualdoctorserver.model.RestaurantOwner
 import org.egi.virtualdoctorserver.model.User
@@ -31,17 +32,10 @@ interface UserRepository : CrudRepository<User, Long> {
      * @return true if a user with the given username exists, false otherwise
      */
 
-    /**
-     * @param username the username of the user
-     * @return the dietary requirements of the user with the given username
-     */
-    @Query("select calorie_limit, max_sugar_content, max_fat_content, max_protein_content, is_vegetarian, is_vegan from users where username = :username", nativeQuery = true)
-    fun findDietaryRequirements(username: String): List<Array<Any>>
 
     @Modifying
     @Query("Alter Sequence users RESTART WITH 1 ", nativeQuery = true)
     fun truncateTable()
 }
-
 
 

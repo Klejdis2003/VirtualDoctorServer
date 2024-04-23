@@ -47,26 +47,6 @@ class UserController(private val userRepository: UserRepository, private val dai
         }
     }
 
-    @GetMapping("/username/{username}/dietary_requirements")
-    fun getUserDietaryRequirements(@PathVariable("username") username: String): ResponseEntity<UserDietaryRequirementsDTO> {
-
-        val user  = try{
-            userRepository.findDietaryRequirements(username)[0]
-        }
-        catch (e: Exception){
-            return ResponseEntity(HttpStatus.NOT_FOUND)
-        }
-        val userDietaryRequirements =
-            UserDietaryRequirementsDTO(
-                user[0] as Int,
-                user[1] as Int,
-                user[2] as Int,
-                user[3] as Int,
-                user[4] as Boolean,
-                user[5] as Boolean)
-        return ResponseEntity(userDietaryRequirements, HttpStatus.OK)
-    }
-
     @GetMapping("/{id}/daily_stats")
     fun getUserDailyStats(@PathVariable("id") userId: Long): ResponseEntity<DailyStatsDTO> {
         try{

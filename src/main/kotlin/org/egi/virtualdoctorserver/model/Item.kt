@@ -4,7 +4,11 @@ import jakarta.persistence.*
 import org.hibernate.annotations.Type
 
 @Entity
-@Table(name = "item")
+@Table(name = "item",
+    uniqueConstraints = [
+        UniqueConstraint(columnNames = ["name", "restaurant_id", "item_type", "price", "calories", "sugar_content", "fat_content", "protein_content", "is_vegetarian", "is_vegan"])
+    ]
+)
 data class Item(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +25,15 @@ data class Item(
     val isVegan: Boolean,
 
     @Enumerated(EnumType.STRING)
-    val itemType: ItemType
+    val itemType: ItemType,
+
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    @ManyToOne
+    val restaurant: Restaurant
 )
 
 
 enum class ItemType {
-    DRINK, MAIN, DESSERT, SNACK
+    FOOD, DRINK, DESSERT
 }
 
