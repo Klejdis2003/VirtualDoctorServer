@@ -1,16 +1,10 @@
 package org.egi.virtualdoctorserver.persistence
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
-import org.egi.virtualdoctorserver.model.Item
-import org.egi.virtualdoctorserver.model.Restaurant
-import org.egi.virtualdoctorserver.model.RestaurantOwner
+import org.egi.virtualdoctorserver.model.DietaryRestrictions
 import org.egi.virtualdoctorserver.model.User
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
-import org.springframework.stereotype.Component
-import org.springframework.stereotype.Repository
 import java.util.*
 
 interface UserRepository : CrudRepository<User, Long> {
@@ -38,4 +32,7 @@ interface UserRepository : CrudRepository<User, Long> {
     fun truncateTable()
 }
 
+interface DietaryRestrictionsRepository : CrudRepository<DietaryRestrictions, Long> {
+    fun save(dietaryRestrictions: DietaryRestrictions): DietaryRestrictions
+}
 

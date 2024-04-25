@@ -1,12 +1,9 @@
 package org.egi.virtualdoctorserver.controller
 
 import org.egi.virtualdoctorserver.dto.DailyStatsDTO
-import org.egi.virtualdoctorserver.dto.UserDietaryRequirementsDTO
-import org.egi.virtualdoctorserver.model.DailyStats
+import org.egi.virtualdoctorserver.model.Stats
 import org.egi.virtualdoctorserver.model.User
-import org.egi.virtualdoctorserver.persistence.DailyStatsRepository
 import org.egi.virtualdoctorserver.persistence.UserRepository
-import org.egi.virtualdoctorserver.services.DailyStatsService
 import org.egi.virtualdoctorserver.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -14,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
-class UserController(private val userRepository: UserRepository, private val dailyStatsService: DailyStatsService) {
+class UserController(private val userRepository: UserRepository,  private val userService: UserService) {
     @GetMapping
     fun getAllUsers() = userRepository.findAll().toList()
 
@@ -23,7 +20,7 @@ class UserController(private val userRepository: UserRepository, private val dai
         if(userRepository.findByUsername(user.username).isPresent){
             return ResponseEntity(HttpStatus.CONFLICT)
         }
-        val createdUser = userRepository.save(user)
+        val createdUser = userService.saveUser(user)
         return ResponseEntity(createdUser, HttpStatus.CREATED)
     }
 
@@ -47,18 +44,42 @@ class UserController(private val userRepository: UserRepository, private val dai
         }
     }
 
-    @GetMapping("/{id}/daily_stats")
-    fun getUserDailyStats(@PathVariable("id") userId: Long): ResponseEntity<DailyStatsDTO> {
+    @GetMapping("/{id}/stats/today")
+    fun getDailyStats(@PathVariable("id") userId: Long): ResponseEntity<Stats> {
         try{
-            val dailyStats = dailyStatsService.getDailyStatsByUserId(userId)
-            return ResponseEntity(dailyStats, HttpStatus.OK)
+            val stats = userService.getDailyStats(userId)
+            return ResponseEntity(stats, HttpStatus.OK)
         }
         catch (e: Exception){
             e.printStackTrace()
-            return ResponseEntity(HttpStatus.NOT_FOUND)
+            return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+
         }
     }
 
+    @GetMapping("/{id}/stats/month")
+    fun getMonthlyStats(@PathVariable("id") userId: Long): ResponseEntity<Stats> {
+        try{
+            val stats = userService.getMonthlyStats(userId)
+            return ResponseEntity(stats, HttpStatus.OK)
+        }
+        catch (e: Exception){
+            e.printStackTrace()
+            return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @PostMapping("/{id}/addItem/{itemId}")
+    fun addUserItem(@PathVariable("id") userId: Long, @PathVariable("itemId") itemId: Long): ResponseEntity<Stats> {
+        println("POST: Adding item $itemId to user $userId's list of consumed items.")
+        try {
+            val stats = userService.addUserItem(userId, itemId)
+            return ResponseEntity(stats, HttpStatus.OK)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
     @PutMapping("/{id}")
     fun updateUser(@PathVariable("id") userId: Int, @RequestBody user: User): ResponseEntity<User> {
         val userToUpdate = userRepository.findById(userId.toLong())

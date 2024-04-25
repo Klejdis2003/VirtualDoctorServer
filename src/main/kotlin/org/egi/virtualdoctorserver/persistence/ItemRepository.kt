@@ -1,8 +1,5 @@
 package org.egi.virtualdoctorserver.persistence
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
-import org.egi.virtualdoctorserver.model.DietaryRestrictions
 import org.egi.virtualdoctorserver.model.Item
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository

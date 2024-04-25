@@ -6,13 +6,9 @@ import org.egi.virtualdoctorserver.model.DietaryRestrictions
 import org.egi.virtualdoctorserver.model.Item
 import org.egi.virtualdoctorserver.persistence.ItemRepository
 import org.egi.virtualdoctorserver.persistence.RestaurantRepository
-import org.hibernate.JDBCException
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
-import java.sql.SQLException
-import java.sql.SQLIntegrityConstraintViolationException
 
 @Service
 class RestaurantService(

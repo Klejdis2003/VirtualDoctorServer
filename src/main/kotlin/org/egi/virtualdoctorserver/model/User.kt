@@ -20,7 +20,7 @@ data class User(
     val weight: Float, //weight in kg
 
     @JoinColumn(name = "dietary_requirements_id", nullable = false)
-    @ManyToOne
+    @OneToOne(cascade = [CascadeType.ALL])
     val dietaryRequirements: DietaryRestrictions
     )
 
