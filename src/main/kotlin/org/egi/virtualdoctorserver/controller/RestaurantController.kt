@@ -1,10 +1,9 @@
 package org.egi.virtualdoctorserver.controller
 
 import org.egi.virtualdoctorserver.dto.ItemDTO
-import org.egi.virtualdoctorserver.model.DietaryRestrictions
+import org.egi.virtualdoctorserver.model.NutritionValues
 import org.egi.virtualdoctorserver.model.Item
 import org.egi.virtualdoctorserver.model.Restaurant
-import org.egi.virtualdoctorserver.persistence.RestaurantRepository
 import org.egi.virtualdoctorserver.services.RestaurantService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,37 +12,26 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/restaurants")
 class RestaurantController(
-    private val restaurantRepository: RestaurantRepository,
     private val restaurantService: RestaurantService
     ) {
     @GetMapping
-    fun getAllRestaurants() = restaurantRepository.findAll().toList()
+    fun getAllRestaurants() = restaurantService.getAllRestaurants()
 
     @GetMapping("/{id}")
-    fun getRestaurantById(@PathVariable("id") restaurantId: Int): ResponseEntity<Restaurant> {
-        val restaurant = restaurantRepository.findById(restaurantId.toLong())
-        return if (restaurant.isPresent) {
-            ResponseEntity(restaurant.get(), HttpStatus.OK)
-        } else {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
+    fun getRestaurantById(@PathVariable("id") restaurantId: Long): ResponseEntity<Restaurant> {
+        val restaurant = restaurantService.getById(restaurantId)
+        return restaurant?.let { ResponseEntity(it, HttpStatus.OK) } ?: ResponseEntity(HttpStatus.NOT_FOUND)
     }
-
-    @GetMapping("/name={name}")
-    fun getRestaurantByName(@PathVariable("name") name: String): List<Restaurant> {
-        val restaurants = restaurantRepository.findByName(name)
-        return restaurants
-    }
-
+    
     @GetMapping("/city={city}")
     fun getRestaurantByCity(@PathVariable("city") city: String): List<Restaurant> {
-        val restaurants = restaurantRepository.findByCity(city)
+        val restaurants = restaurantService.filterByCity(city)
         return restaurants
     }
 
     @GetMapping("/owner={ownerId}")
-    fun getRestaurantByOwner(@PathVariable("ownerId") ownerId: Int): List<Restaurant> {
-        val restaurants = restaurantRepository.findByOwnerId(ownerId.toLong())
+    fun getRestaurantByOwner(@PathVariable("ownerId") ownerId: Long): List<Restaurant> {
+        val restaurants = restaurantService.filterByOwner(ownerId)
         return restaurants
     }
 
@@ -68,7 +56,7 @@ class RestaurantController(
     }
 
     @GetMapping("/filteredItems")
-    fun filterItemsByDietaryRestrictions(@RequestBody dietaryRestrictions: DietaryRestrictions): ResponseEntity<List<Item>> {
+    fun filterItemsByDietaryRestrictions(@RequestBody dietaryRestrictions: NutritionValues): ResponseEntity<List<Item>> {
         try{
             val restaurantItems = restaurantService.filterItemsByDietaryRestrictions(dietaryRestrictions)
             return ResponseEntity(restaurantItems, HttpStatus.OK)
@@ -79,9 +67,9 @@ class RestaurantController(
     }
 
     @GetMapping("/{id}/filteredMenu")
-    fun filterRestaurantMenuByDietaryRestrictions(@PathVariable("id") restaurantId: Long, @RequestBody dietaryRestrictions: DietaryRestrictions): ResponseEntity<List<Item>> {
+    fun filterRestaurantMenuByDietaryRestrictions(@PathVariable("id") restaurantId: Long, @RequestBody nutritionValues: NutritionValues): ResponseEntity<List<Item>> {
         try {
-            val restaurantItems = restaurantService.filterItemsByDietaryRestrictions(dietaryRestrictions)
+            val restaurantItems = restaurantService.filterItemsByDietaryRestrictions(nutritionValues)
             return ResponseEntity(restaurantItems, HttpStatus.OK)
         }
         catch (e: Exception) {
@@ -91,19 +79,19 @@ class RestaurantController(
     }
     @PostMapping("")
     fun createRestaurant(@RequestBody restaurant: Restaurant): ResponseEntity<Restaurant> {
-        val createdRestaurant = restaurantRepository.save(restaurant)
+        val createdRestaurant = restaurantService.save(restaurant)
         return ResponseEntity(createdRestaurant, HttpStatus.CREATED)
     }
 
     @PutMapping("/{id}")
-    fun updateRestaurant(@PathVariable("id") restaurantId: Int, @RequestBody restaurant: Restaurant): ResponseEntity<Restaurant> {
-        val updatedRestaurant = restaurantRepository.save(restaurant)
+    fun updateRestaurant(@PathVariable("id") restaurantId: Long, @RequestBody restaurant: Restaurant): ResponseEntity<Restaurant> {
+        val updatedRestaurant = restaurantService.save(restaurant)
         return ResponseEntity(updatedRestaurant, HttpStatus.OK)
     }
 
     @DeleteMapping("/{id}")
-    fun deleteRestaurant(@PathVariable("id") restaurantId: Int): ResponseEntity<Unit> {
-        restaurantRepository.deleteById(restaurantId.toLong())
+    fun deleteRestaurant(@PathVariable("id") restaurantId: Long): ResponseEntity<Unit> {
+        restaurantService.delete(restaurantId)
         return ResponseEntity(HttpStatus.NO_CONTENT)
     }
 

@@ -8,11 +8,5 @@ data class ItemDTO(
     val description: String,
     val imageUrl: String,
     val price: Float,
-    val calories: Int,
-    val sugarContent: Int,
-    val fatContent: Int,
-    val proteinContent: Int,
-    val isVegetarian: Boolean,
-    val isVegan: Boolean,
     val itemType: ItemType
 )

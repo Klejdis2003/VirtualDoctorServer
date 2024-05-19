@@ -1,4 +1,4 @@
-package org.egi.virtualdoctorserver.persistence
+package org.egi.virtualdoctorserver.repositories
 
 import jakarta.transaction.Transactional
 import org.egi.virtualdoctorserver.model.UserItem

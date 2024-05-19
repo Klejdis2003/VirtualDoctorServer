@@ -2,11 +2,9 @@ package org.egi.virtualdoctorserver.services
 
 import org.egi.virtualdoctorserver.model.Stats
 import org.egi.virtualdoctorserver.model.User
-import org.egi.virtualdoctorserver.model.UserItem
-import org.egi.virtualdoctorserver.persistence.DietaryRestrictionsRepository
-import org.egi.virtualdoctorserver.persistence.UserItemRepository
-import org.egi.virtualdoctorserver.persistence.UserRepository
-import org.springframework.beans.factory.annotation.Autowired
+import org.egi.virtualdoctorserver.repositories.NutritionValuesRepository
+import org.egi.virtualdoctorserver.repositories.UserItemRepository
+import org.egi.virtualdoctorserver.repositories.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.*
@@ -14,7 +12,8 @@ import java.util.*
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val dietaryRestrictionsRepository: DietaryRestrictionsRepository,
+    private val nutritionGoalRepository: NutritionValuesRepository,
+    private val nutritionValuesRepository: NutritionValuesRepository,
     private val userItemRepository: UserItemRepository
 ) {
     /**
@@ -23,15 +22,13 @@ class UserService(
      * @return the saved user, with updated primary and foreign keys
      */
     fun saveUser(user: User): User {
-        val dietaryRequirements = user.dietaryRequirements
-        val createdDietaryRestrictions = dietaryRestrictionsRepository.save(dietaryRequirements)
         try {
-            val createdUser = userRepository.save(user.copy(dietaryRequirements = createdDietaryRestrictions))
-            return createdUser
+            val createdUser = userRepository.save(user)
         } catch (e: Exception) {
             e.printStackTrace()
             throw Exception("An error occurred while saving the user")
         }
+        return user
     }
 
     fun getDailyStats(userId: Long): Stats {

@@ -1,9 +1,8 @@
 package org.egi.virtualdoctorserver.controller
 
-import org.egi.virtualdoctorserver.dto.DailyStatsDTO
 import org.egi.virtualdoctorserver.model.Stats
 import org.egi.virtualdoctorserver.model.User
-import org.egi.virtualdoctorserver.persistence.UserRepository
+import org.egi.virtualdoctorserver.repositories.UserRepository
 import org.egi.virtualdoctorserver.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -1,8 +1,8 @@
 package org.egi.virtualdoctorserver.mappers
 
-import jakarta.persistence.Id
 import org.egi.virtualdoctorserver.dto.ItemDTO
 import org.egi.virtualdoctorserver.model.Item
+import org.egi.virtualdoctorserver.model.NutritionValues
 import org.egi.virtualdoctorserver.model.Restaurant
 import org.springframework.stereotype.Component
 
@@ -15,13 +15,7 @@ class ItemMapper {
             description = item.description,
             imageUrl = item.imageUrl,
             price = item.price,
-            calories = item.calories,
-            sugarContent = item.sugarContent,
-            fatContent = item.fatContent,
-            proteinContent = item.proteinContent,
-            isVegetarian = item.isVegetarian,
-            isVegan = item.isVegan,
-            itemType = item.itemType,
+            itemType = item.itemType
         )
     }
 
@@ -32,14 +26,10 @@ class ItemMapper {
             description = itemDTO.description,
             imageUrl = itemDTO.imageUrl,
             price = itemDTO.price,
-            calories = itemDTO.calories,
-            sugarContent = itemDTO.sugarContent,
-            fatContent = itemDTO.fatContent,
-            proteinContent = itemDTO.proteinContent,
-            isVegetarian = itemDTO.isVegetarian,
-            isVegan = itemDTO.isVegan,
             itemType = itemDTO.itemType,
-            restaurant = restaurant
+            restaurant = restaurant,
+            ingredients = emptyList(),
+            nutritionValues = NutritionValues(0, 0, 0, 0, 0)
         )
     }
 }

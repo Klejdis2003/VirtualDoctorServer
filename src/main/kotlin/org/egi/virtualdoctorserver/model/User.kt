@@ -19,8 +19,14 @@ data class User(
     val height: Float, //height in cm
     val weight: Float, //weight in kg
 
-    @JoinColumn(name = "dietary_requirements_id", nullable = false)
+    @JoinColumn(name = "nutrition_goal_id", nullable = false)
     @OneToOne(cascade = [CascadeType.ALL])
-    val dietaryRequirements: DietaryRestrictions
-    )
-
+    val nutritionGoal: NutritionGoal
+) : ModelTemplate {
+    override fun validate() {
+        require(age >= 10) { "User's age cannot be lower than 10." }
+        require(height >= 0) { "Height cannot be negative" }
+        require(weight >= 0) { "Weight cannot be negative" }
+        nutritionGoal.validate()
+    }
+}

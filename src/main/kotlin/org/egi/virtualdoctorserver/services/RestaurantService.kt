@@ -2,10 +2,11 @@ package org.egi.virtualdoctorserver.services
 
 import org.egi.virtualdoctorserver.dto.ItemDTO
 import org.egi.virtualdoctorserver.mappers.ItemMapper
-import org.egi.virtualdoctorserver.model.DietaryRestrictions
+import org.egi.virtualdoctorserver.model.NutritionValues
 import org.egi.virtualdoctorserver.model.Item
-import org.egi.virtualdoctorserver.persistence.ItemRepository
-import org.egi.virtualdoctorserver.persistence.RestaurantRepository
+import org.egi.virtualdoctorserver.model.Restaurant
+import org.egi.virtualdoctorserver.repositories.ItemRepository
+import org.egi.virtualdoctorserver.repositories.RestaurantRepository
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
@@ -17,19 +18,32 @@ class RestaurantService(
     private val itemMapper: ItemMapper
 ) {
     fun getAllRestaurants() = restaurantRepository.findAll().toList()
+
+    fun getById(restaurantId: Long): Restaurant? {
+        return restaurantRepository.getById(restaurantId)
+    }
+
+    fun filterByCity(city: String): List<Restaurant> {
+        return restaurantRepository.findByCity(city)
+    }
+
+    fun filterByOwner(ownerId: Long): List<Restaurant> {
+        return restaurantRepository.findByOwnerId(ownerId)
+    }
+
+
     fun getRestaurantMenu(restaurantId: Long): List<ItemDTO> {
         return itemRepository.getByRestaurantId(restaurantId)
             .map { itemMapper.toDTO(it) }
     }
-    fun filterItemsByDietaryRestrictions(dietaryRestrictions: DietaryRestrictions): List<Item> {
-        return itemRepository.findAllItemsByDietaryRestrictions(
-            dietaryRestrictions.calorieLimit,
-            dietaryRestrictions.maxProteinContent,
-            dietaryRestrictions.maxFatContent,
-            dietaryRestrictions.maxSugarContent,
-            dietaryRestrictions.isVegetarian,
-            dietaryRestrictions.isVegan
-        )
+    fun filterItemsByDietaryRestrictions(dietaryValues: NutritionValues): List<Item> {
+//        return itemRepository.filterByDietaryRestrictions(
+//            dietaryValues.calories,
+//            dietaryValues.protein,
+//            dietaryValues.fat,
+//            dietaryValues.sugar,
+//        )
+        TODO()
     }
 
     fun addItemToMenu(restaurantId: Long, itemDTO: ItemDTO){
@@ -50,5 +64,16 @@ class RestaurantService(
         catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun save(restaurant: Restaurant): Restaurant {
+        return restaurantRepository.save(restaurant)
+    }
+
+    fun delete(restaurantId: Long) {
+        restaurantRepository.deleteById(restaurantId)
+    }
+    fun delete(restaurant: Restaurant) {
+        restaurantRepository.delete(restaurant)
     }
 }

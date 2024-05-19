@@ -1,6 +1,6 @@
-package org.egi.virtualdoctorserver.persistence
+package org.egi.virtualdoctorserver.repositories
 
-import org.egi.virtualdoctorserver.model.DietaryRestrictions
+import org.egi.virtualdoctorserver.model.NutritionValues
 import org.egi.virtualdoctorserver.model.User
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -32,7 +32,11 @@ interface UserRepository : CrudRepository<User, Long> {
     fun truncateTable()
 }
 
-interface DietaryRestrictionsRepository : CrudRepository<DietaryRestrictions, Long> {
-    fun save(dietaryRestrictions: DietaryRestrictions): DietaryRestrictions
+interface NutritionGoalRepository : CrudRepository<NutritionValues, Long> {
+    fun save(dietaryRestrictions: NutritionValues): NutritionValues
+}
+
+interface NutritionValuesRepository : CrudRepository<NutritionValues, Long> {
+    fun save(nutritionValues: NutritionValues): NutritionValues
 }
 

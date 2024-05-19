@@ -1,4 +1,4 @@
-package org.egi.virtualdoctorserver.persistence
+package org.egi.virtualdoctorserver.repositories
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext

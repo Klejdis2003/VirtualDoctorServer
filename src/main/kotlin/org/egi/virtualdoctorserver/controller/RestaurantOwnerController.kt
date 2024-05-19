@@ -2,7 +2,7 @@ package org.egi.virtualdoctorserver.controller
 
 import org.egi.virtualdoctorserver.model.Restaurant
 import org.egi.virtualdoctorserver.model.RestaurantOwner
-import org.egi.virtualdoctorserver.persistence.RestaurantOwnerRepository
+import org.egi.virtualdoctorserver.repositories.RestaurantOwnerRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
