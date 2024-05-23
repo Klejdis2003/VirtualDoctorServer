@@ -25,7 +25,15 @@ data class Restaurant(
 
     @JoinColumn(name = "owner_id", nullable = false)
     @ManyToOne
-    val owner: RestaurantOwner
+    val owner: RestaurantOwner,
+
+    @ManyToMany
+    @JoinTable(
+        name = "restaurant_menu",
+        joinColumns = [JoinColumn(name = "restaurant_id")],
+        inverseJoinColumns = [JoinColumn(name = "item_id")]
+    )
+    private val menu: MutableList<Item> = mutableListOf()
 ) {
     companion object {
         private val owners = RestaurantOwner.VALUES
@@ -143,4 +151,8 @@ data class Restaurant(
 
         )
     }
+
+    fun addToMenu(item: Item) = menu.add(item)
+    fun deleteFromMenu(item: Item) = menu.remove(item)
+    fun getMenuSize() = menu.size
 }

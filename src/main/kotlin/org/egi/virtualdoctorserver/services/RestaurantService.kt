@@ -52,6 +52,8 @@ class RestaurantService(
 
         try {
             itemRepository.save(item)
+            restaurant.addToMenu(item)
+            restaurantRepository.save(restaurant)
         }
 
         catch (e: DataIntegrityViolationException) {
