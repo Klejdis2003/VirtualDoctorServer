@@ -33,8 +33,7 @@ class RestaurantService(
 
 
     fun getRestaurantMenu(restaurantId: Long): List<ItemDTO> {
-        return itemRepository.getByRestaurantId(restaurantId)
-            .map { itemMapper.toDTO(it) }
+        return itemRepository.getByRestaurantId(restaurantId).map { itemMapper.toItemDTO(it) }
     }
     fun filterItemsByDietaryRestrictions(dietaryValues: NutritionValues): List<Item> {
 //        return itemRepository.filterByDietaryRestrictions(
@@ -49,7 +48,7 @@ class RestaurantService(
     fun addItemToMenu(restaurantId: Long, itemDTO: ItemDTO){
         val restaurant = restaurantRepository.findById(restaurantId)
             .orElseThrow { IllegalArgumentException("Restaurant with id $restaurantId does not exist") }
-        val item = itemMapper.toEntity(itemDTO, restaurant)
+        val item = itemMapper.toItem(itemDTO)
 
         try {
             itemRepository.save(item)

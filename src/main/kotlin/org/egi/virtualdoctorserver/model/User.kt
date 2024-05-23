@@ -1,6 +1,7 @@
 package org.egi.virtualdoctorserver.model
 
-import jakarta.persistence.*;
+import jakarta.persistence.*
+
 
 const val NO_LIMIT = Integer.MAX_VALUE
 @Entity
@@ -8,7 +9,7 @@ const val NO_LIMIT = Integer.MAX_VALUE
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long = 0,
 
     @Column(unique = true)
     val email: String,
@@ -16,17 +17,39 @@ data class User(
     val username: String,
 
     val age: Int,
-    val height: Float, //height in cm
-    val weight: Float, //weight in kg
+    val height: Int, //height in cm
+    val weight: Int, //weight in kg
 
     @JoinColumn(name = "nutrition_goal_id", nullable = false)
-    @OneToOne(cascade = [CascadeType.ALL])
-    val nutritionGoal: NutritionGoal
-) : ModelTemplate {
+    @ManyToOne
+    val nutritionPlan: NutritionPlan,
+
+    @ManyToOne
+    @JoinColumn(name = "nutrition_type_id", nullable = false)
+    val nutritionType: NutritionType,
+
+    ) : ModelTemplate {
+    init {
+        validate()
+    }
     override fun validate() {
         require(age >= 10) { "User's age cannot be lower than 10." }
         require(height >= 0) { "Height cannot be negative" }
         require(weight >= 0) { "Weight cannot be negative" }
-        nutritionGoal.validate()
+        nutritionPlan.validate()
+    }
+
+    companion object {
+        val VALUES = listOf(
+            User(
+                email = "JohnDoe@gmail.com",
+                username = "JohnDoe",
+                age = 30,
+                height = 180,
+                weight = 80,
+                nutritionPlan = NutritionPlan.PLANS[0],
+                nutritionType = NutritionType.VALUES[0],
+            )
+        )
     }
 }

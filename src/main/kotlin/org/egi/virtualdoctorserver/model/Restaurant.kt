@@ -8,14 +8,21 @@ data class Restaurant(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
+
+    @Column(unique = true)
     val name: String,
+
     val streetAddress: String,
     val city: String,
     val postcode: String,
     val country: String,
     val telephone: String,
+
+    @Column(unique = true)
     val email: String,
+    @Column(unique = true)
     val website: String,
+
     @JoinColumn(name = "owner_id", nullable = false)
     @ManyToOne
     val owner: RestaurantOwner

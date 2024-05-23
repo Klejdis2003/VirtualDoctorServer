@@ -8,6 +8,20 @@ import jakarta.persistence.*
         UniqueConstraint(columnNames = ["name", "restaurant_id", "item_type", "price"])
     ]
 )
+
+/**
+ * Represents an item that can be ordered from a restaurant
+ * @property id the unique identifier of the item
+ * @property name the name of the item
+ * @property description a description of the item
+ * @property imageUrl a URL to an image of the item (local or online)
+ * @property price the price of the item
+ * @property nutritionValues the nutritional values of the item
+ * @property itemType the type of item (food, drink, dessert)
+ * @property restaurant the restaurant that serves the item
+ * @property ingredients the ingredients that make up the item
+ * @property nutritionTypes the nutrition types that the item falls under
+ */
 class Item(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,10 +30,13 @@ class Item(
     val description: String,
     val imageUrl: String,
     val price: Float,
-    @ManyToOne(cascade = [CascadeType.ALL])
-    val nutritionValues: NutritionValues,
+
+    @OneToOne(cascade = [CascadeType.ALL])
+    @PrimaryKeyJoinColumn
+    val nutritionValues: ItemNutritionValues,
+
     @Enumerated(EnumType.STRING)
-    val itemType: ItemType,
+    val type: ItemType,
 
     @JoinColumn(name = "restaurant_id", nullable = false)
     @ManyToOne
@@ -33,25 +50,31 @@ class Item(
     )
     val ingredients: List<Ingredient>,
 
+
+) : ModelTemplate {
+
     @ManyToMany
     @JoinTable(
         name = "item_nutrition_types",
         joinColumns = [JoinColumn(name = "item_id")],
         inverseJoinColumns = [JoinColumn(name = "nutrition_type_id")]
     )
-    private val _nutritionTypes: MutableList<NutritionType> = mutableListOf(NutritionType.MAP["Omnivore"]!!)
+    var nutritionTypes: List<NutritionType> = NutritionType.VALUES
+    private set
 
-
-) : ModelTemplate {
-    val nutritionTypes: List<NutritionType>
-        get() = _nutritionTypes.toList()
-
-    fun addNutritionType(nutritionType: NutritionType) {
-        _nutritionTypes.add(nutritionType)
+    init {
+        addNutritionTypes()
     }
 
-    fun removeNutritionType(nutritionType: NutritionType) {
-        _nutritionTypes.remove(nutritionType)
+
+    private fun addNutritionTypes(){
+        val nutritionTypes = NutritionType.VALUES
+        val itemIngredientTypes = ingredients.map { it.type }.toHashSet()
+        nutritionTypes.forEach { nutritionType ->
+            if (nutritionType.disallowedIngredientTypes.any { itemIngredientTypes.contains(it) }) {
+                this.nutritionTypes -= nutritionType
+            }
+        }
     }
 
 
@@ -69,18 +92,15 @@ class Item(
 
         other as Item
 
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (description != other.description) return false
-        if (imageUrl != other.imageUrl) return false
-        if (price != other.price) return false
-        if (nutritionValues != other.nutritionValues) return false
-        if (itemType != other.itemType) return false
-        if (restaurant != other.restaurant) return false
-        if (ingredients != other.ingredients) return false
-        if (nutritionTypes != other.nutritionTypes) return false
-
-        return true
+        return  name == other.name &&
+                description == other.description &&
+                imageUrl == other.imageUrl &&
+                price == other.price &&
+                nutritionValues == other.nutritionValues &&
+                type == other.type &&
+                restaurant == other.restaurant &&
+                ingredients == other.ingredients &&
+                nutritionTypes == other.nutritionTypes
     }
 
     override fun hashCode(): Int {
@@ -90,7 +110,7 @@ class Item(
         result = 31 * result + imageUrl.hashCode()
         result = 31 * result + price.hashCode()
         result = 31 * result + nutritionValues.hashCode()
-        result = 31 * result + itemType.hashCode()
+        result = 31 * result + type.hashCode()
         result = 31 * result + restaurant.hashCode()
         result = 31 * result + ingredients.hashCode()
         result = 31 * result + nutritionTypes.hashCode()
@@ -105,13 +125,13 @@ class Item(
                     description = "A delicious cheeseburger",
                     imageUrl = "https://www.sargento.com/assets/Uploads/Recipe/Image/burger_0.jpg",
                     price = 5.99f,
-                    nutritionValues = NutritionValues(
+                    nutritionValues = ItemNutritionValues(
                         calories = 500,
                         fat = 20,
                         protein = 30,
                         carbohydrates = 50
                     ),
-                    itemType = ItemType.FOOD,
+                    type = ItemType.FOOD,
                     restaurant = Restaurant.VALUES[0],
                     ingredients = listOf(
                         Ingredient.INGREDIENT_MAP["Beef"]!!,
@@ -124,6 +144,8 @@ class Item(
             )
 
     }
+
+
 
 }
 

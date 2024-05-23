@@ -2,6 +2,7 @@ package org.egi.virtualdoctorserver.repositories
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import org.egi.virtualdoctorserver.model.ItemNutritionValues
 import org.egi.virtualdoctorserver.model.Restaurant
 import org.egi.virtualdoctorserver.model.RestaurantOwner
 import org.springframework.data.repository.CrudRepository
@@ -16,6 +17,10 @@ interface RestaurantOwnerRepository : CrudRepository<RestaurantOwner, Long>, Res
     fun findByUsername(username: String): Optional<RestaurantOwner>
     fun findByEmail(email: String): Optional<RestaurantOwner>
 
+}
+
+interface ItemNutritionValuesRepository : CrudRepository<ItemNutritionValues, Long> {
+    fun save(nutritionValues: ItemNutritionValues): ItemNutritionValues
 }
 
 @Repository

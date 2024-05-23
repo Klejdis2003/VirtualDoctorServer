@@ -19,4 +19,3 @@ interface ItemRepository : CrudRepository<Item, Long> {
 }
 
 interface IngredientRepository : CrudRepository<Ingredient, Long> {}
-

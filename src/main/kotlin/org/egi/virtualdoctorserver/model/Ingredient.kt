@@ -4,12 +4,14 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
-@Table(name = "ingredient")
+@Table(name = "ingredient", uniqueConstraints = [UniqueConstraint(columnNames = ["name", "type"])])
 data class Ingredient(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
+
     val name: String,
+
     @Enumerated(EnumType.STRING)
     val type: IngredientType
 ): ModelTemplate
@@ -52,7 +54,7 @@ data class Ingredient(
             put(
                 IngredientType.SEED, setOf(
                     "Chia", "Flax", "Hemp", "Pumpkin", "Sunflower",
-                    "Sesame", "Poppy", "Quinoa", "Safflower", "Mustard"
+                    "Sesame", "Poppy", "Safflower", "Mustard"
                 )
             )
             put(

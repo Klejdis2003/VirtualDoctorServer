@@ -1,5 +1,6 @@
 package org.egi.virtualdoctorserver.controller
 
+import org.egi.virtualdoctorserver.dto.ItemDTOWithRestaurant
 import org.egi.virtualdoctorserver.model.NutritionValues
 import org.egi.virtualdoctorserver.model.Item
 import org.egi.virtualdoctorserver.services.ItemService
@@ -15,9 +16,9 @@ class ItemController(
     private val itemService: ItemService
 ) {
     @GetMapping("")
-    fun getAllItems(): ResponseEntity<List<Item>> {
+    fun getAllItems(): ResponseEntity<List<ItemDTOWithRestaurant>> {
         return try {
-            ResponseEntity.ok(itemService.getAllItems())
+            ResponseEntity.ok(itemService.getAll())
         } catch (e: Exception) {
             ResponseEntity.status(500).build()
         }
@@ -27,7 +28,7 @@ class ItemController(
        println("GET /items/filteredItems")
         return try {
             ResponseEntity.ok(
-                itemService.filterByDietaryRestrictions(nutritionValues)
+                itemService.filterByNutritionValues(nutritionValues)
             )
         } catch (e: Exception) {
             println(e.message)
