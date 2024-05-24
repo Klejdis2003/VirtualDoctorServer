@@ -10,7 +10,7 @@ import java.time.LocalDate
 data class UserItem(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long = 0,
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne
@@ -22,4 +22,16 @@ data class UserItem(
 
     @Nonnull
     val date: LocalDate = LocalDate.now()
-)
+): ModelTemplate {
+    init {
+        validate()
+    }
+
+    override fun validate() {
+        require(id >= 0) { "id must be greater than or equal to 0" }
+        require(user.id >= 0) { "user id must be greater than or equal to 0" }
+        require(item.id >= 0) { "item id must be greater than or equal to 0" }
+    }
+
+}
+

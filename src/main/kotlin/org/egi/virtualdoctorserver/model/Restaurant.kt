@@ -1,5 +1,6 @@
 package org.egi.virtualdoctorserver.model
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 
 @Entity
@@ -25,15 +26,8 @@ data class Restaurant(
 
     @JoinColumn(name = "owner_id", nullable = false)
     @ManyToOne
-    val owner: RestaurantOwner,
 
-    @ManyToMany
-    @JoinTable(
-        name = "restaurant_menu",
-        joinColumns = [JoinColumn(name = "restaurant_id")],
-        inverseJoinColumns = [JoinColumn(name = "item_id")]
-    )
-    private val menu: MutableList<Item> = mutableListOf()
+    val owner: RestaurantOwner,
 ) {
     companion object {
         private val owners = RestaurantOwner.VALUES
@@ -152,7 +146,4 @@ data class Restaurant(
         )
     }
 
-    fun addToMenu(item: Item) = menu.add(item)
-    fun deleteFromMenu(item: Item) = menu.remove(item)
-    fun getMenuSize() = menu.size
 }

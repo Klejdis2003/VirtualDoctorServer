@@ -5,6 +5,9 @@ import jakarta.transaction.Transactional
 import org.egi.virtualdoctorserver.model.*
 import org.egi.virtualdoctorserver.repositories.*
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.LocalDateTime
+import kotlin.random.Random
 
 @Service
 class DataInitializationService(
@@ -14,7 +17,8 @@ class DataInitializationService(
     val restaurantRepository: RestaurantRepository,
     val itemRepository: ItemRepository,
     val nutritionPlanRepository: NutritionPlanRepository,
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+    val userItemRepository: UserItemRepository
 ) {
     @PostConstruct
     @Transactional
@@ -26,6 +30,7 @@ class DataInitializationService(
         initializeItems()
         initializeNutritionGoalPlans()
         initializeUsers()
+        initializeUserItems()
     }
 
     private fun initializeDietTypes() {
@@ -58,6 +63,17 @@ class DataInitializationService(
         val nutritionTypes = nutritionTypeRepository.findAll().toList()
         val vals = User.VALUES.map { it.copy(nutritionPlan = nutritionalPlans.random(), nutritionType = nutritionTypes.random()) }
         if (userRepository.count() == 0L) userRepository.saveAll(vals)
+    }
+
+    private fun initializeUserItems() {
+        val user = userRepository.findAll().first()
+        val item = itemRepository.findAll().first()
+        val userItems: List<UserItem> = buildList {
+            for (i in 1..10) { //random dates
+                add(UserItem(user = user, item = item, date = LocalDate.now().minusDays(Random.nextLong(0, 40))))
+            }
+        }
+        if(userItemRepository.count() == 0L) userItemRepository.saveAll(userItems)
     }
 
 }

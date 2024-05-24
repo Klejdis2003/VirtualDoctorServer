@@ -5,10 +5,12 @@ import org.egi.virtualdoctorserver.exceptions.ConflictException
 import org.egi.virtualdoctorserver.exceptions.NotFoundException
 import org.egi.virtualdoctorserver.model.NutritionPlan
 import org.egi.virtualdoctorserver.model.NutritionValues
+import org.egi.virtualdoctorserver.model.User
 import org.egi.virtualdoctorserver.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/users")
@@ -17,14 +19,12 @@ class UserController(private val userService: UserService) {
     fun getAllUsers() = userService.getAll()
 
     @PostMapping("")
-    fun createUser(@RequestBody user: UserDTO): ResponseEntity<Any> {
+    fun createUser(@RequestBody user: UserDTO): ResponseEntity<UserDTO> {
         return try {
             val createdUser = userService.createUser(user)
             ResponseEntity(createdUser, HttpStatus.CREATED)
         } catch (e: ConflictException) {
-            ResponseEntity.status(HttpStatus.CONFLICT).body(e.message)
-        } catch (e: Exception) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            throw ResponseStatusException(HttpStatus.CONFLICT, e.message)
         }
     }
 
@@ -93,30 +93,24 @@ class UserController(private val userService: UserService) {
         }
     }
     @PutMapping
-    fun updateUser(@RequestBody user: UserDTO): ResponseEntity<Any> {
+    fun updateUser(@RequestBody user: UserDTO): ResponseEntity<UserDTO> {
         return try {
             val updatedUser = userService.update(user)
             ResponseEntity(updatedUser, HttpStatus.OK)
         } catch(_: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         } catch (_: UnsupportedOperationException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Do not change NutritionGoal values using this endpoint. Use /users/{id}/nutritionGoal instead.")
-        }
-        catch (_: Exception) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID must be provided.")
         }
     }
 
     @PutMapping("/{username}/customNutritionPlan")
-    fun updateNutritionPlanToCustom(@PathVariable("username") username: String, @RequestBody nutritionPlan: NutritionPlan): ResponseEntity<Any> {
+    fun updateNutritionPlanToCustom(@PathVariable("username") username: String, @RequestBody nutritionPlan: NutritionPlan): ResponseEntity<UserDTO> {
         return try {
             val updatedUser = userService.updateNutritionGoalToCustom(username, nutritionPlan)
             ResponseEntity(updatedUser, HttpStatus.OK)
         } catch(_: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist.")
         }
     }
     @DeleteMapping("/{id}")

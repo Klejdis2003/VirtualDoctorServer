@@ -4,7 +4,6 @@ import org.egi.virtualdoctorserver.model.Ingredient
 import org.egi.virtualdoctorserver.model.Item
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.query.Param
 
 
 interface ItemRepository : CrudRepository<Item, Long> {
@@ -16,6 +15,20 @@ interface ItemRepository : CrudRepository<Item, Long> {
     fun getByRestaurantId(restaurantId: Long): List<Item>
 
 
+    @Query(value = """
+        SELECT I FROM Item I
+        WHERE LOWER(:nutritionTypeName) = ANY (SELECT LOWER(N.name) FROM I.nutritionTypes N) """)
+    fun findByNutritionTypeName(nutritionTypeName: String): List<Item>
+
+
+    @Query(value = """
+        SELECT I FROM Item I
+        WHERE LOWER(:nutritionTypeName) = ANY (SELECT LOWER(N.name) FROM I.nutritionTypes N)
+        AND I.restaurant.id = :restaurantId """)
+    fun findByNutritionTypeNameAndRestaurant(nutritionTypeName: String, restaurantId: Long): List<Item>
+
+
+    fun findByPriceLessThanEqual(price: Float): List<Item>
 }
 
 interface IngredientRepository : CrudRepository<Ingredient, Long> {}

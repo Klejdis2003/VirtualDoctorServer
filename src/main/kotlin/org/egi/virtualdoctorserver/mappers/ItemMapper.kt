@@ -4,6 +4,7 @@ import org.egi.virtualdoctorserver.dto.ItemDTO
 import org.egi.virtualdoctorserver.dto.ItemDTOWithRestaurant
 import org.egi.virtualdoctorserver.exceptions.NotFoundException
 import org.egi.virtualdoctorserver.model.Item
+import org.egi.virtualdoctorserver.model.Restaurant
 import org.egi.virtualdoctorserver.repositories.ItemRepository
 import org.egi.virtualdoctorserver.services.ItemService
 import org.springframework.stereotype.Component
@@ -43,10 +44,17 @@ class ItemMapper(
     }
 
     @Throws(NotFoundException::class)
-    fun toItem(itemDTO: ItemDTO): Item {
-        val item = itemRepository
-            .findById(itemDTO.id)
-            .orElseThrow { NotFoundException("Item with id ${itemDTO.id} not found") }
+    fun toItem(itemDTO: ItemDTO, restaurant: Restaurant): Item {
+        val item = Item(
+            name = itemDTO.name,
+            description = itemDTO.description,
+            price = itemDTO.price,
+            nutritionValues = nutritionValuesMapper.toItemNutritionValues(itemDTO.nutritionValues),
+            ingredients = itemDTO.ingredients,
+            imageUrl = itemDTO.imageUrl,
+            type = itemDTO.type,
+            restaurant = restaurant
+        )
         return item
     }
 }

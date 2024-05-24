@@ -1,5 +1,6 @@
 package org.egi.virtualdoctorserver.model
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
 
 @Entity
@@ -153,4 +154,6 @@ class Item(
 enum class ItemType {
     FOOD, DRINK, DESSERT
 }
+
+
 

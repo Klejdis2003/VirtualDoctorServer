@@ -1,7 +1,9 @@
 package org.egi.virtualdoctorserver.services
 
 import org.egi.virtualdoctorserver.dto.ItemDTOWithRestaurant
+import org.egi.virtualdoctorserver.exceptions.InvalidQueryParamException
 import org.egi.virtualdoctorserver.exceptions.NoPermissionException
+import org.egi.virtualdoctorserver.filters.ItemFilter
 import org.egi.virtualdoctorserver.mappers.ItemMapper
 import org.egi.virtualdoctorserver.model.*
 import org.egi.virtualdoctorserver.repositories.ItemRepository
@@ -13,8 +15,19 @@ class ItemService(
     private val itemRepository: ItemRepository,
     private val itemMapper: ItemMapper
 ) {
-    fun getAll(): List<ItemDTOWithRestaurant> =
-        itemRepository.findAll().map { itemMapper.toItemDTOWithRestaurant(it) }
+    private val itemFilter = ItemFilter()
+    fun getAll(filters: Map<String, String> = emptyMap()): List<ItemDTOWithRestaurant> {
+        var items = itemRepository.findAll().toList()
+        return try {
+            items = itemFilter.filter(items, filters)
+            items.map { itemMapper.toItemDTOWithRestaurant(it) }
+        } catch (e: NoSuchElementException) {
+            throw InvalidQueryParamException("Invalid filter provided. Available filters are: ${itemFilter.filterTypes.map { it.filterName }}")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
 
 
     fun get(id: Long): ItemDTOWithRestaurant? {
@@ -34,21 +47,13 @@ class ItemService(
         throw NoPermissionException("Invalid key provided. No permission to delete all items.")
     }
 
-    fun filterByUserPreferences(user: User): List<Item> {
-        return filter(user.nutritionPlan.nutritionValues, user.nutritionType)
-    }
 
-    fun filter(nutritionValues: NutritionValues, nutritionType: NutritionType): List<Item> {
-        val items = itemRepository.findAll().toList()
-        val filteredByNutritionValues = filterByNutritionValues(nutritionValues)
-        val filteredByNutritionType = filterByNutritionType(nutritionType)
-        return filteredByNutritionType.intersect(filteredByNutritionValues.toSet()).toList()
-    }
-
-    fun filterByNutritionGoal(nutritionPlan: NutritionPlan): List<Item> {
-       return filterByNutritionValues(nutritionPlan.nutritionValues)
-    }
-
+    /**
+     * Only returns the items where each of the nutrients is less than or equal to values
+     * specified in the nutritionValues parameter.
+     * @param nutritionValues The maximum values for each nutrient.
+     * @return A list of items that meet the criteria.
+     */
     fun filterByNutritionValues(nutritionValues: NutritionValues): List<Item> {
         val items = itemRepository.findAll().toList()
         return items.filter{
@@ -59,46 +64,41 @@ class ItemService(
             }
     }
 
-    fun filterByNutritionType(nutritionType: NutritionType): List<Item> {
-        val items = itemRepository.findAll().toList()
-        return items.filter { it.nutritionTypes.contains(nutritionType) }
-    }
-
-    fun getHighProteinItems(): List<ItemDTOWithRestaurant> {
-        val items = itemRepository.findAll().toList()
-        return items
-            .filter { it.nutritionValues.protein >= 20 }
-            .map { itemMapper.toItemDTOWithRestaurant(it) }
-    }
-
-    fun getHighCarbItems(): List<ItemDTOWithRestaurant> {
-        val items = itemRepository.findAll().toList()
-        return items
-            .filter { it.nutritionValues.carbohydrates >= 50 }
-            .map { itemMapper.toItemDTOWithRestaurant(it) }
-    }
-
-    fun getLowCalorieItems(): List<ItemDTOWithRestaurant> {
-        val items = itemRepository.findAll().toList()
-        return items
-            .filter { it.nutritionValues.calories <= 500 }
-            .map { itemMapper.toItemDTOWithRestaurant(it) }
-    }
-
-    fun getHealthyItems(): List<ItemDTOWithRestaurant> {
-        val items = itemRepository.findAll().toList()
-        return items
-            .filter {
-                it.nutritionValues.calories <= 500 &&
-                it.nutritionValues.protein >= 20 &&
-                it.nutritionValues.fat <= 20 &&
-                it.nutritionValues.carbohydrates <= 50
-            }
-            .map { itemMapper.toItemDTOWithRestaurant(it) }
-    }
 
     fun update(item: Item): Item {
         return itemRepository.save(item)
     }
 
+    fun help(): String{
+        val html = """
+            <html>
+            <head>
+                <title>Item Service</title>
+            </head>
+            <body>
+                <h1>Item Service</h1>
+                <p>This service provides methods to interact with items in the database.</p>
+                <h2>Endpoints</h2>
+                <ul>
+                    <li>GET /items</li>
+                    <p>Optional query parameters:</p>
+                        <ul>
+                            ${
+                                itemFilter.filterTypes.joinToString(separator = "") {
+                                    "<li>${it.filterName}</li>"
+                                }
+                            }
+                        </ul>
+                    <li>GET /items/{id}</li>
+                    <li>POST /items</li>
+                    <li>DELETE /items/{id}</li>
+                    <li>DELETE /items</li>
+                </ul>
+            
+            </body>
+            </html>
+        """.trimIndent()
+        return html
+    }
 }
+
