@@ -8,13 +8,11 @@ const val NO_LIMIT = Integer.MAX_VALUE
 @Table(name = "users")
 data class User(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-
-    @Column(unique = true)
-    val email: String,
     @Column(unique = true)
     val username: String,
+
+    val email: String,
+    @Column(unique = true)
 
     val age: Int,
     val height: Int, //height in cm

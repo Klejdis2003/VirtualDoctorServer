@@ -11,6 +11,7 @@ data class NutritionPlan(
     val name: String = "No Plan",
     val description: String = "",
     @OneToOne(cascade = [CascadeType.ALL])
+    @PrimaryKeyJoinColumn
     val nutritionValues: NutritionGoalValues = NutritionGoalValues(),
     @Enumerated(EnumType.STRING)
     val type: NutritionPlanType = NutritionPlanType.CUSTOM

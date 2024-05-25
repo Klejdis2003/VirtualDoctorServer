@@ -5,7 +5,9 @@ import org.egi.virtualdoctorserver.dto.UserDTO
 import org.egi.virtualdoctorserver.model.User
 
 
-class UserMapper(private val nutritionTypeMapper: NutritionTypeMapper) {
+class UserMapper(
+    private val nutritionTypeMapper: NutritionTypeMapper) {
+
     fun toUserDTO(user: User): UserDTO {
         return UserDTO(
             email = user.email,

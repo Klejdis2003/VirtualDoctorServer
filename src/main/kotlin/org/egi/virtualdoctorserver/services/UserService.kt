@@ -44,7 +44,7 @@ class UserService(
     fun get(id: Long): UserDTO? =
         userRepository.findById(id).map { userMapper.toUserDTO(it) }.orElse(null)
 
-    fun getByEmail(email: String): UserDTO? =
+    fun get(email: String): UserDTO? =
         userRepository.findByEmail(email).map { userMapper.toUserDTO(it) }.orElse(null)
 
     fun getByUsername(username: String): UserDTO? =
@@ -115,30 +115,30 @@ class UserService(
         throw NoPermissionException("Invalid key provided. No permission to delete all users.")
     }
 
-    fun getDailyStats(userId: Long): NutritionValues {
+    fun getDailyStats(username: String): NutritionValues {
         val date = LocalDate.now().atStartOfDay().toLocalDate()
-        val dailyUserItems = userItemRepository.getByUserIdAndDateBetween(userId, date, date)
+        val dailyUserItems = userItemRepository.getByUserUsernameAndDateBetween(username, date, date)
         val stats = NutritionGoalValues.buildFromUserItemList(dailyUserItems)
         return stats
     }
 
-    fun getMonthlyStats(userId: Long): NutritionValues {
+    fun getMonthlyStats(username: String): NutritionValues {
         val startDate = LocalDate.now().withDayOfMonth(1)
         val endDate = startDate.plusMonths(1).minusDays(1)
-        val monthlyUserItems = userItemRepository.getByUserIdAndDateBetween(userId, startDate, endDate)
+        val monthlyUserItems = userItemRepository.getByUserUsernameAndDateBetween(username, startDate, endDate)
         val monthlyStats = NutritionGoalValues.buildFromUserItemList(monthlyUserItems)
         return monthlyStats
     }
 
     /**
      * Add an item to a user's list of consumed items
-     * @param userId the id of the userository.save(item)
+     * @param username the id of the userository.save(item)
      * @param itemId the id of the item
      * @return the updated stats of the user for the day
      */
-    fun addUserItem(userId: Long, itemId: Long): NutritionValues{
-        userItemRepository.save(userId, itemId)
-        return getDailyStats(userId)
+    fun addUserItem(username: String, itemId: Long): NutritionValues{
+        userItemRepository.save(username, itemId)
+        return getDailyStats(username)
     }
 
     fun updateNutritionGoalToPredefined(username: String, planId: Long): UserDTO {

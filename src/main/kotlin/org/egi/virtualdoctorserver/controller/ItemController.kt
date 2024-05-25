@@ -2,9 +2,6 @@ package org.egi.virtualdoctorserver.controller
 
 import org.egi.virtualdoctorserver.dto.ItemDTOWithRestaurant
 import org.egi.virtualdoctorserver.exceptions.InvalidQueryParamException
-import org.egi.virtualdoctorserver.model.NutritionValues
-import org.egi.virtualdoctorserver.model.Item
-import org.egi.virtualdoctorserver.model.NutritionType
 import org.egi.virtualdoctorserver.services.ItemService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -5,7 +5,6 @@ import org.egi.virtualdoctorserver.exceptions.ConflictException
 import org.egi.virtualdoctorserver.exceptions.NotFoundException
 import org.egi.virtualdoctorserver.model.NutritionPlan
 import org.egi.virtualdoctorserver.model.NutritionValues
-import org.egi.virtualdoctorserver.model.User
 import org.egi.virtualdoctorserver.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,6 +14,8 @@ import org.springframework.web.server.ResponseStatusException
 @RestController
 @RequestMapping("/users")
 class UserController(private val userService: UserService) {
+
+
     @GetMapping
     fun getAllUsers() = userService.getAll()
 
@@ -28,10 +29,10 @@ class UserController(private val userService: UserService) {
         }
     }
 
-    @GetMapping("/{id}")
-    fun getUser(@PathVariable("id") userId: Long): ResponseEntity<UserDTO> {
+    @GetMapping("/{username}")
+    fun getUser(@PathVariable("username") username: Long): ResponseEntity<UserDTO> {
         return try {
-            val user = userService.get(userId)
+            val user = userService.get(username)
             return if (user != null)
                 ResponseEntity(user, HttpStatus.OK)
              else
@@ -45,7 +46,7 @@ class UserController(private val userService: UserService) {
     @GetMapping("find")
     fun getUserByEmail(@RequestParam email: String): ResponseEntity<UserDTO> {
         return try {
-            val user = userService.getByEmail(email)
+            val user = userService.get(email)
             return if (user != null)
                 ResponseEntity(user, HttpStatus.OK)
              else
@@ -56,10 +57,10 @@ class UserController(private val userService: UserService) {
         }
     }
 
-    @GetMapping("/{id}/stats/today")
-    fun getDailyStats(@PathVariable("id") userId: Long): ResponseEntity<NutritionValues> {
+    @GetMapping("/{username}/stats/today")
+    fun getDailyStats(@PathVariable("username") username: String): ResponseEntity<NutritionValues> {
         try{
-            val stats = userService.getDailyStats(userId)
+            val stats = userService.getDailyStats(username)
             return ResponseEntity(stats, HttpStatus.OK)
         }
         catch (e: Exception){
@@ -70,9 +71,9 @@ class UserController(private val userService: UserService) {
     }
 
     @GetMapping("/{id}/stats/month")
-    fun getMonthlyStats(@PathVariable("id") userId: Long): ResponseEntity<NutritionValues> {
+    fun getMonthlyStats(@PathVariable("id") username: String): ResponseEntity<NutritionValues> {
         try{
-            val stats = userService.getMonthlyStats(userId)
+            val stats = userService.getMonthlyStats(username)
             return ResponseEntity(stats, HttpStatus.OK)
         }
         catch (e: Exception){
@@ -82,10 +83,10 @@ class UserController(private val userService: UserService) {
     }
 
     @PostMapping("/{id}/addItem/{itemId}")
-    fun addUserItem(@PathVariable("id") userId: Long, @PathVariable("itemId") itemId: Long): ResponseEntity<NutritionValues> {
-        println("POST: Adding item $itemId to user $userId's list of consumed items.")
+    fun addUserItem(@PathVariable("id") username: String, @PathVariable("itemId") itemId: Long): ResponseEntity<NutritionValues> {
+        println("POST: Adding item $itemId to user $username's list of consumed items.")
         try {
-            val stats = userService.addUserItem(userId, itemId)
+            val stats = userService.addUserItem(username, itemId)
             return ResponseEntity(stats, HttpStatus.OK)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -135,6 +136,7 @@ class UserController(private val userService: UserService) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
+
 
 
 }

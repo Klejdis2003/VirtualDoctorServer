@@ -4,7 +4,6 @@ import org.egi.virtualdoctorserver.dto.NutritionValuesDTO
 import org.egi.virtualdoctorserver.model.ItemNutritionValues
 import org.egi.virtualdoctorserver.model.NutritionGoalValues
 import org.egi.virtualdoctorserver.model.NutritionValues
-import org.springframework.stereotype.Component
 
 class NutritionValuesMapper {
     fun toNutritionValuesDTO(nutritionValues: NutritionValues): NutritionValuesDTO {
@@ -16,8 +15,9 @@ class NutritionValuesMapper {
         )
     }
 
-    fun toNutritionGoalValues(nutritionValuesDTO: NutritionValuesDTO): NutritionGoalValues {
+    fun toNutritionGoalValues(nutritionValuesDTO: NutritionValuesDTO, id: Long = 0): NutritionGoalValues {
         return NutritionGoalValues(
+            id = id,
             calories = nutritionValuesDTO.calories,
             protein = nutritionValuesDTO.protein,
             fat = nutritionValuesDTO.fat,

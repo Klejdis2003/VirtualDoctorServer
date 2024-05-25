@@ -12,7 +12,7 @@ data class UserItem(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "username", nullable = false)
     @ManyToOne
     val user: User,
 
@@ -29,7 +29,7 @@ data class UserItem(
 
     override fun validate() {
         require(id >= 0) { "id must be greater than or equal to 0" }
-        require(user.id >= 0) { "user id must be greater than or equal to 0" }
+        require(user.username.isNotEmpty()) { "username must not be empty" }
         require(item.id >= 0) { "item id must be greater than or equal to 0" }
     }
 
