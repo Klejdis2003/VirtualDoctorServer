@@ -11,8 +11,8 @@ data class User(
     @Column(unique = true)
     val username: String,
 
-    val email: String,
     @Column(unique = true)
+    val email: String,
 
     val age: Int,
     val height: Int, //height in cm

@@ -1,12 +1,12 @@
 package org.egi.virtualdoctorserver.mappers
 
-import org.egi.virtualdoctorserver.controller.NutritionTypeMapper
 import org.egi.virtualdoctorserver.dto.UserDTO
 import org.egi.virtualdoctorserver.model.User
 
 
 class UserMapper(
-    private val nutritionTypeMapper: NutritionTypeMapper) {
+    private val nutritionTypeMapper: NutritionTypeMapper
+) {
 
     fun toUserDTO(user: User): UserDTO {
         return UserDTO(

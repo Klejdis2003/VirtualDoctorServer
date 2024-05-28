@@ -1,4 +1,4 @@
-package org.egi.virtualdoctorserver.controller
+package org.egi.virtualdoctorserver.mappers
 
 import org.egi.virtualdoctorserver.dto.NutritionTypeDTO
 import org.egi.virtualdoctorserver.model.NutritionType

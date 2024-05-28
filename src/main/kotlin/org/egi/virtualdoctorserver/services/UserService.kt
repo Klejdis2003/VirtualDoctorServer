@@ -1,6 +1,6 @@
 package org.egi.virtualdoctorserver.services
 
-import org.egi.virtualdoctorserver.controller.NutritionTypeMapper
+import org.egi.virtualdoctorserver.mappers.NutritionTypeMapper
 import org.egi.virtualdoctorserver.dto.UserDTO
 import org.egi.virtualdoctorserver.exceptions.ConflictException
 import org.egi.virtualdoctorserver.exceptions.NoPermissionException
@@ -41,8 +41,6 @@ class UserService(
     }
     fun getAll(): List<UserDTO> = userRepository.findAll().map { userMapper.toUserDTO(it) }
 
-    fun get(id: Long): UserDTO? =
-        userRepository.findById(id).map { userMapper.toUserDTO(it) }.orElse(null)
 
     fun get(email: String): UserDTO? =
         userRepository.findByEmail(email).map { userMapper.toUserDTO(it) }.orElse(null)
@@ -61,7 +59,8 @@ class UserService(
                 nutritionPlanRepository.save(userDTO.nutritionPlan)
             else if(userDTO.nutritionType.id < 0L)
                 throw IllegalArgumentException("Valid ids start from 1.")
-
+            else if(userRepository.existsByEmail(userDTO.email))
+                throw ConflictException("User with email ${userDTO.email} already exists")
             val user = userMapper.toUser(userDTO)
             val createdUser = userRepository.save(user)
             return userMapper.toUserDTO(createdUser)

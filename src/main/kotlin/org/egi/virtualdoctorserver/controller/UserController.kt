@@ -17,10 +17,14 @@ class UserController(private val userService: UserService) {
 
 
     @GetMapping
-    fun getAllUsers() = userService.getAll()
+    fun getAllUsers(): ResponseEntity<List<UserDTO>> {
+        println("GET /users")
+        return ResponseEntity(userService.getAll(), HttpStatus.OK)
+    }
 
     @PostMapping("")
     fun createUser(@RequestBody user: UserDTO): ResponseEntity<UserDTO> {
+        println("POST /users - $user")
         return try {
             val createdUser = userService.createUser(user)
             ResponseEntity(createdUser, HttpStatus.CREATED)
@@ -30,7 +34,8 @@ class UserController(private val userService: UserService) {
     }
 
     @GetMapping("/{username}")
-    fun getUser(@PathVariable("username") username: Long): ResponseEntity<UserDTO> {
+    fun getUser(@PathVariable("username") username: String): ResponseEntity<UserDTO> {
+        println("GET /users/$username")
         return try {
             val user = userService.get(username)
             return if (user != null)
