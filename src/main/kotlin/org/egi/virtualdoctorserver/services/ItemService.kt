@@ -73,7 +73,7 @@ class ItemService(
     private fun getItemWithUpdatedNutritionTypes(item: Item): Item{
         val nutritionTypes = nutritionTypeRepository.findAll()
         val itemIngredientTypes = item.ingredients.map { it.type }.toHashSet()
-        val itemNutritionTypes = item.nutritionTypes.toMutableSet()
+        val itemNutritionTypes = nutritionTypes.toMutableSet()
         nutritionTypes.forEach { nutritionType ->
             if (nutritionType.disallowedIngredientTypes.any { itemIngredientTypes.contains(it) }) {
                 itemNutritionTypes.remove(nutritionType)
