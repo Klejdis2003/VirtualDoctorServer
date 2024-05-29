@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service
 class RestaurantService(
     private val restaurantRepository: RestaurantRepository,
     private val itemRepository: ItemRepository,
+    private val itemService: ItemService,
     private val itemMapper: ItemMapper
 ) {
     private val restaurantMapper = RestaurantMapper(itemMapper)
@@ -92,7 +93,7 @@ class RestaurantService(
         val restaurant = restaurantRepository.findById(restaurantId)
             .orElseThrow { IllegalArgumentException("Restaurant with id $restaurantId does not exist") }
         val item = itemMapper.toItem(itemDTO, restaurant)
-        itemRepository.save(item)
+        itemService.create(item)
         return getRestaurantMenu(restaurantId)
     }
 

@@ -1,5 +1,6 @@
 package org.egi.virtualdoctorserver.services
 
+import jakarta.transaction.Transactional
 import org.egi.virtualdoctorserver.mappers.NutritionTypeMapper
 import org.egi.virtualdoctorserver.dto.UserDTO
 import org.egi.virtualdoctorserver.exceptions.ConflictException
@@ -129,12 +130,14 @@ class UserService(
         return monthlyStats
     }
 
+
     /**
      * Add an item to a user's list of consumed items
      * @param username the id of the userository.save(item)
      * @param itemId the id of the item
      * @return the updated stats of the user for the day
      */
+    @Transactional
     fun addUserItem(username: String, itemId: Long): NutritionValues{
         userItemRepository.save(username, itemId)
         return getDailyStats(username)

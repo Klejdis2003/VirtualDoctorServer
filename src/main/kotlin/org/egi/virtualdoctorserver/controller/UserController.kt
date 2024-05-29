@@ -87,8 +87,8 @@ class UserController(private val userService: UserService) {
         }
     }
 
-    @PostMapping("/{id}/addItem/{itemId}")
-    fun addUserItem(@PathVariable("id") username: String, @PathVariable("itemId") itemId: Long): ResponseEntity<NutritionValues> {
+    @PostMapping("/{username}/addItem/{itemId}")
+    fun addUserItem(@PathVariable("username") username: String, @PathVariable("itemId") itemId: Long): ResponseEntity<NutritionValues> {
         println("POST: Adding item $itemId to user $username's list of consumed items.")
         try {
             val stats = userService.addUserItem(username, itemId)

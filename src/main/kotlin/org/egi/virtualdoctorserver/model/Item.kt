@@ -51,33 +51,15 @@ class Item(
     )
     val ingredients: List<Ingredient>,
 
-
-) : ModelTemplate {
-
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "item_nutrition_types",
         joinColumns = [JoinColumn(name = "item_id")],
         inverseJoinColumns = [JoinColumn(name = "nutrition_type_id")]
     )
-    var nutritionTypes: List<NutritionType> = NutritionType.VALUES
-    private set
+    val nutritionTypes: List<NutritionType> = emptyList()
 
-    init {
-        addNutritionTypes()
-    }
-
-
-    private fun addNutritionTypes(){
-        val nutritionTypes = NutritionType.VALUES
-        val itemIngredientTypes = ingredients.map { it.type }.toHashSet()
-        nutritionTypes.forEach { nutritionType ->
-            if (nutritionType.disallowedIngredientTypes.any { itemIngredientTypes.contains(it) }) {
-                this.nutritionTypes -= nutritionType
-            }
-        }
-    }
-
+) : ModelTemplate {
 
     override fun validate() {
         require(name.isNotBlank()) { "Name cannot be blank" }
@@ -140,12 +122,38 @@ class Item(
                         Ingredient.INGREDIENT_MAP["Bun"]!!,
                         Ingredient.INGREDIENT_MAP["Lettuce"]!!,
                         Ingredient.INGREDIENT_MAP["Bacon"]!!
+                    ),
+                    nutritionTypes = listOf(
+                        NutritionType.MAP["Omnivore"]!!,
+                        NutritionType.MAP["Keto"]!!
                     )
                 )
             )
 
     }
 
+    fun copy(
+        name: String = this.name,
+        description: String = this.description,
+        imageUrl: String = this.imageUrl,
+        price: Float = this.price,
+        nutritionValues: ItemNutritionValues = this.nutritionValues,
+        type: ItemType = this.type,
+        restaurant: Restaurant = this.restaurant,
+        ingredients: List<Ingredient> = this.ingredients,
+        nutritionTypes: List<NutritionType> = this.nutritionTypes
+    ) = Item(
+        name = name,
+        description = description,
+        imageUrl = imageUrl,
+        price = price,
+        nutritionValues = nutritionValues,
+        type = type,
+        restaurant = restaurant,
+        ingredients = ingredients,
+        nutritionTypes = nutritionTypes
+
+    )
 
 
 }

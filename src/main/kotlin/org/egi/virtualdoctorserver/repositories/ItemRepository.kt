@@ -31,4 +31,6 @@ interface ItemRepository : CrudRepository<Item, Long> {
     fun findByPriceLessThanEqual(price: Float): List<Item>
 }
 
-interface IngredientRepository : CrudRepository<Ingredient, Long> {}
+interface IngredientRepository : CrudRepository<Ingredient, Long> {
+    fun searchByNameContainsIgnoreCaseOrderByName(name: String): List<Ingredient>
+}

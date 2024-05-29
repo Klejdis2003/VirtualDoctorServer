@@ -62,6 +62,7 @@ class RestaurantController(
 
     @PostMapping("/{id}/menu")
     fun addItemToMenu(@PathVariable("id") restaurantId: Long, @RequestBody itemDTO: ItemDTO): ResponseEntity<List<ItemDTO>> {
+        println("POST/restaurants/$restaurantId/menu - $itemDTO")
         try {
             restaurantService.addItemToMenu(restaurantId, itemDTO)
             return ResponseEntity(restaurantService.getRestaurantMenu(restaurantId), HttpStatus.CREATED)
@@ -70,6 +71,7 @@ class RestaurantController(
             return ResponseEntity(HttpStatus.CONFLICT)
         }
         catch (e: Exception) {
+            e.printStackTrace()
             return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }

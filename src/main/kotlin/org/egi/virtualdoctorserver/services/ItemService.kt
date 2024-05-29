@@ -6,14 +6,17 @@ import org.egi.virtualdoctorserver.exceptions.NoPermissionException
 import org.egi.virtualdoctorserver.filters.ItemFilter
 import org.egi.virtualdoctorserver.mappers.ItemMapper
 import org.egi.virtualdoctorserver.model.*
+import org.egi.virtualdoctorserver.repositories.IngredientRepository
 import org.egi.virtualdoctorserver.repositories.ItemRepository
+import org.egi.virtualdoctorserver.repositories.NutritionTypeRepository
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
 @Service
 class ItemService(
     private val itemRepository: ItemRepository,
-    private val itemMapper: ItemMapper
+    private val ingredientRepository: IngredientRepository,
+    private val itemMapper: ItemMapper, private val nutritionTypeRepository: NutritionTypeRepository
 ) {
     private val itemFilter = ItemFilter()
     fun getAll(filters: Map<String, String> = emptyMap()): List<ItemDTOWithRestaurant> {
@@ -34,7 +37,10 @@ class ItemService(
         return itemRepository.findById(id).map { itemMapper.toItemDTOWithRestaurant(it) }.orElse(null)
     }
 
-    fun create(item: Item) = itemRepository.save(item)
+    fun create(item: Item) {
+        val newItem = getItemWithUpdatedNutritionTypes(item)
+        itemRepository.save(newItem)
+    }
 
     fun delete(id: Long) = itemRepository.deleteById(id)
 
@@ -62,6 +68,23 @@ class ItemService(
                 it.nutritionValues.carbohydrates <= nutritionValues.carbohydrates &&
                 it.nutritionValues.calories <= nutritionValues.calories
             }
+    }
+
+    private fun getItemWithUpdatedNutritionTypes(item: Item): Item{
+        val nutritionTypes = nutritionTypeRepository.findAll()
+        val itemIngredientTypes = item.ingredients.map { it.type }.toHashSet()
+        val itemNutritionTypes = item.nutritionTypes.toMutableSet()
+        nutritionTypes.forEach { nutritionType ->
+            if (nutritionType.disallowedIngredientTypes.any { itemIngredientTypes.contains(it) }) {
+                itemNutritionTypes.remove(nutritionType)
+            }
+        }
+        val newItem = item.copy(nutritionTypes = itemNutritionTypes.toList())
+        return newItem
+    }
+
+    fun searchIngredients(query: String): List<Ingredient> {
+        return ingredientRepository.searchByNameContainsIgnoreCaseOrderByName(query)
     }
 
 
